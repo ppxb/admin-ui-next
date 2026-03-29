@@ -1,0 +1,141 @@
+<script lang="ts" setup>
+import type { AnalysisOverviewItem } from '@vben/common-ui';
+import type { TabOption } from '@vben/types';
+
+import { ref } from 'vue';
+
+import {
+  AnalysisChartCard,
+  AnalysisChartsTabs,
+  AnalysisOverview,
+  MarkdownPreviewer,
+} from '@vben/common-ui';
+import {
+  SvgBellIcon,
+  SvgCakeIcon,
+  SvgCardIcon,
+  SvgDownloadIcon,
+} from '@vben/icons';
+
+import { Alert, Spin } from 'antdv-next';
+
+import AnalyticsTrends from './analytics-trends.vue';
+import AnalyticsVisitsData from './analytics-visits-data.vue';
+import AnalyticsVisitsSales from './analytics-visits-sales.vue';
+import AnalyticsVisitsSource from './analytics-visits-source.vue';
+import AnalyticsVisits from './analytics-visits.vue';
+import md from './change.md?raw';
+
+const overviewItems: AnalysisOverviewItem[] = [
+  {
+    icon: SvgCardIcon,
+    title: '用户量',
+    totalTitle: '总用户量',
+    totalValue: 120_000,
+    value: 2000,
+  },
+  {
+    icon: SvgCakeIcon,
+    title: '访问量',
+    totalTitle: '总访问量',
+    totalValue: 500_000,
+    value: 20_000,
+  },
+  {
+    icon: SvgDownloadIcon,
+    title: '下载量',
+    totalTitle: '总下载量',
+    totalValue: 120_000,
+    value: 8000,
+  },
+  {
+    icon: SvgBellIcon,
+    title: '使用量',
+    totalTitle: '总使用量',
+    totalValue: 50_000,
+    value: 5000,
+  },
+];
+
+const chartTabs: TabOption[] = [
+  {
+    label: '流量趋势',
+    value: 'trends',
+  },
+  {
+    label: '月访问量',
+    value: 'visits',
+  },
+];
+
+function handleClick() {
+  window.notification.success({
+    title: '新的 notification 样式',
+    description: 'ant design',
+  });
+}
+
+const loading = ref(true);
+
+function keepOneMessage() {
+  window.message.success('只有一条消息');
+}
+</script>
+
+<template>
+  <div class="p-5">
+    <div class="mb-5">
+      <Alert :show-icon="true" type="success">
+        <template #message>
+          该分支使用antdv-next替代不维护的ant-design-vue
+          <a-button
+            class="ml-2"
+            size="small"
+            type="primary"
+            @click="handleClick"
+          >
+            新的 notification 样式
+          </a-button>
+          <a-button
+            class="ml-2"
+            size="small"
+            type="primary"
+            @click="keepOneMessage"
+          >
+            保持一条消息
+          </a-button>
+        </template>
+      </Alert>
+    </div>
+
+    <Spin :spinning="loading">
+      <MarkdownPreviewer
+        class="mb-4"
+        v-model:value="md"
+        @mounted="() => (loading = false)"
+      />
+    </Spin>
+
+    <AnalysisOverview :items="overviewItems" />
+    <AnalysisChartsTabs :tabs="chartTabs" class="mt-5">
+      <template #trends>
+        <AnalyticsTrends />
+      </template>
+      <template #visits>
+        <AnalyticsVisits />
+      </template>
+    </AnalysisChartsTabs>
+
+    <div class="mt-5 w-full md:flex">
+      <AnalysisChartCard class="mt-5 md:mt-0 md:mr-4 md:w-1/3" title="访问数量">
+        <AnalyticsVisitsData />
+      </AnalysisChartCard>
+      <AnalysisChartCard class="mt-5 md:mt-0 md:mr-4 md:w-1/3" title="访问来源">
+        <AnalyticsVisitsSource />
+      </AnalysisChartCard>
+      <AnalysisChartCard class="mt-5 md:mt-0 md:w-1/3" title="访问来源">
+        <AnalyticsVisitsSales />
+      </AnalysisChartCard>
+    </div>
+  </div>
+</template>

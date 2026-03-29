@@ -1,0 +1,156 @@
+@reference "tailwindcss";
+/* antdv-next 组件库的一些样式重置 */
+
+body {
+  /**
+   * 全局启用 抗锯齿字体
+   * @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-smooth
+   */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ant-app {
+  width: 100%;
+  height: 100%;
+  /* 会导致页面无法滚动 */
+  /* overscroll-behavior: none; */
+  color: inherit;
+}
+
+/* .ant-btn {
+  .anticon {
+    display: inline-flex;
+  }
+
+  > svg {
+    display: inline-block;
+  }
+
+  > svg + span {
+    margin-inline-start: 6px;
+  }
+} */
+
+/* .ant-tag {
+  > svg {
+    display: inline-block;
+  }
+
+  > svg + span {
+    margin-inline-start: 4px;
+  }
+} */
+
+.ant-message-notice-content,
+.ant-notification-notice {
+  &:is(.dark *) {
+    border-color: hsl(var(--border) / 60%);
+    border-width: 1px;
+  }
+}
+
+.form-valid-error {
+  /** select 选择器的样式 */
+  --vben-form-error-shadow: 0 0 0 2px rgba(255, 35, 5, 0.1);
+
+  .ant-select:not(.valid-success) .ant-select-selector:not(.valid-success) {
+    border-color: hsl(var(--destructive)) !important;
+  }
+
+  .ant-select-focused .ant-select-selector {
+    box-shadow: var(--vben-form-error-shadow) !important;
+  }
+
+  /** 数字输入框样式 */
+  .ant-input-number-focused {
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  .ant-input-number.ant-input-number-mode-input {
+    border-color: hsl(var(--destructive));
+  }
+
+  /** 密码输入框样式 */
+  .ant-input-affix-wrapper:hover {
+    border-color: hsl(var(--destructive));
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  .ant-input:not(.valid-success) {
+    border-color: hsl(var(--destructive)) !important;
+  }
+
+  /* select focus-within样式 */
+  .ant-picker-outlined:focus,
+  .ant-picker-outlined:focus-within {
+    border-color: hsl(var(--destructive));
+  }
+  /* focus样式 shadow */
+  .ant-select.ant-select-outlined:not(.ant-select-disabled).ant-select-focused {
+    /* --ant-select-active-outline-color: var(--vben-form-error-shadow); */
+    box-shadow: var(--vben-form-error-shadow);
+  }
+
+  /* InputNumber */
+  .ant-input-number-outlined:focus,
+  .ant-input-number-outlined:focus-within {
+    --ant-input-number-active-border-color: hsl(var(--destructive));
+  }
+
+  .ant-mentions-outlined:focus,
+  .ant-mentions-outlined:focus-within {
+    --ant-mentions-active-border-color: hsl(var(--destructive));
+    --ant-mentions-active-shadow: var(--vben-form-error-shadow);
+  }
+
+  .ant-input-outlined:focus,
+  .ant-input-outlined:focus-within {
+    --ant-input-active-border-color: hsl(var(--destructive));
+    --ant-input-active-shadow: var(--vben-form-error-shadow);
+  }
+}
+
+/** 区间选择器下面来回切换时的样式 */
+.form-valid-error .ant-picker-active-bar {
+  background-color: hsl(var(--destructive));
+}
+
+/** 时间选择器的样式 */
+.form-valid-error .ant-picker-focused {
+  box-shadow: var(--vben-form-error-shadow);
+}
+
+/** 前后置小圆点样式 */
+.dot-before-common {
+  @apply before:relative before:top-[-2px] before:mr-[5px] before:inline-block before:size-[6px] before:rounded-full before:content-[''];
+}
+
+.dot-before-red {
+  @apply before:relative before:top-[-2px] before:mr-[5px] before:inline-block before:size-[6px] before:rounded-full before:content-[''] before:bg-red-500;
+}
+
+.dot-before-green {
+  @apply before:relative before:top-[-2px] before:mr-[5px] before:inline-block before:size-[6px] before:rounded-full before:content-[''] before:bg-green-500;
+}
+
+/**
+vxe表格右上角toolbar元素之间的间距
+*/
+.vxe-button + .vxe-button.type--button {
+  margin-left: 8px !important;
+}
+
+/**
+vxe默认圆角
+*/
+html {
+  --vxe-ui-border-radius: 8px !important;
+}
+
+/**
+vxe表格loading 只加载表格 不加载上面的表单
+*/
+.vxe-grid.is--loading::before {
+  content: none !important;
+}
