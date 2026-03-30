@@ -1,6 +1,4 @@
 {
-  "tailwindCSS.experimental.configFile": "internal/tailwind-config/src/theme.css",
-  "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
   // workbench
   "workbench.list.smoothScrolling": true,
   "workbench.startupEditor": "newUntitledFile",
@@ -23,7 +21,7 @@
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "editor.acceptSuggestionOnEnter": "smart",
   "editor.suggest.snippetsPreventQuickSuggestions": false,
-  "editor.stickyScroll.enabled": false,
+  "editor.stickyScroll.enabled": true,
   "editor.hover.sticky": true,
   "editor.suggest.insertMode": "replace",
   "editor.bracketPairColorization.enabled": true,
@@ -31,6 +29,7 @@
   "editor.autoClosingDelete": "always",
   "editor.autoClosingOvertype": "always",
   "editor.autoClosingQuotes": "beforeWhitespace",
+  "editor.linkedEditing": true,
   "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
   "editor.quickSuggestions": {
     "strings": "on"
@@ -79,13 +78,14 @@
 
   // extensions
   "extensions.ignoreRecommendations": true,
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
 
   // terminal
   "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.persistentSessionReviveProcess": "never",
   "terminal.integrated.tabs.enabled": true,
   "terminal.integrated.scrollback": 10000,
-  "terminal.integrated.stickyScroll.enabled": false,
+  "terminal.integrated.stickyScroll.enabled": true,
 
   // files
   "files.eol": "\n",
@@ -99,24 +99,6 @@
     "*.json": "jsonc",
     "package.json": "json"
   },
-
-  "files.exclude": {
-    "**/.eslintcache": true,
-    "**/bower_components": true,
-    "**/.turbo": true,
-    "**/.idea": true,
-    "**/.vitepress": true,
-    "**/tmp": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.stylelintcache": true,
-    "**/.DS_Store": true,
-    "**/vite.config.mts.*": true,
-    "**/tea.yaml": true,
-    "**/public/tinymce/**": true
-  },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
@@ -124,46 +106,32 @@
     "**/node_modules/**": true,
     "**/tmp/**": true,
     "**/bower_components/**": true,
-    "**/dist/**": true,
-    "**/yarn.lock": true
+    "**/dist/**": true
   },
-
-  "typescript.tsserver.exclude": ["**/node_modules", "**/dist", "**/.turbo"],
 
   // search
   "search.searchEditor.singleClickBehaviour": "peekDefinition",
   "search.followSymlinks": false,
-  // 使用搜索功能时，将这些文件和文件夹排除在外
   "search.exclude": {
     "**/node_modules": true,
-    "**/*.log": true,
-    "**/*.log*": true,
-    "**/bower_components": true,
     "**/dist": true,
-    "**/elehukouben": true,
     "**/.git": true,
     "**/.github": true,
     "**/.gitignore": true,
-    "**/.svn": true,
     "**/.DS_Store": true,
-    "**/.vitepress/cache": true,
     "**/.idea": true,
     "**/.vscode": false,
-    "**/.yarn": true,
     "**/tmp": true,
     "*.xml": true,
     "out": true,
     "dist": true,
     "node_modules": true,
     "CHANGELOG.md": true,
-    "**/pnpm-lock.yaml": true,
-    "**/yarn.lock": true
+    "**/pnpm-lock.yaml": true
   },
-
   "debug.onTaskErrors": "debugAnyway",
   "diffEditor.ignoreTrimWhitespace": false,
   "npm.packageManager": "pnpm",
-
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
@@ -173,7 +141,6 @@
   "emmet.triggerExpansionOnTab": false,
 
   "errorLens.enabledDiagnosticLevels": ["warning", "error"],
-  "errorLens.excludeBySource": ["cSpell", "Grammarly"],
 
   "stylelint.enable": true,
   "stylelint.packageManager": "pnpm",
@@ -185,32 +152,10 @@
   "js/ts.preferences.preferTypeOnlyAutoImports": true,
   "js/ts.preferences.includePackageJsonAutoImports": "on",
 
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "javascriptreact",
-    "typescriptreact",
-    "vue",
-    "html",
-    "markdown",
-    "json",
-    "jsonc",
-    "json5",
-    "yaml"
-  ],
-
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
-
-  "github.copilot.enable": {
-    "*": true,
-    "markdown": true,
-    "plaintext": false,
-    "yaml": false
-  },
-
-  "cssVariables.lookupFiles": ["packages/@core/base/design/src/**/*.css"],
+  "tailwindCSS.experimental.configFile": "internal/tailwind-config/src/theme.css",
 
   "i18n-ally.localesPaths": [
     "packages/locales/src/langs",
@@ -223,40 +168,5 @@
   "i18n-ally.enabledFrameworks": ["vue", "react"],
   "i18n-ally.keystyle": "nested",
   "i18n-ally.sortKeys": true,
-  "i18n-ally.namespace": true,
-
-  // 控制相关文件嵌套展示
-  "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.expand": false,
-  "explorer.fileNesting.patterns": {
-    "*.ts": "$(capture).test.ts, $(capture).test.tsx, $(capture).spec.ts, $(capture).spec.tsx, $(capture).d.ts",
-    "*.tsx": "$(capture).test.ts, $(capture).test.tsx, $(capture).spec.ts, $(capture).spec.tsx,$(capture).d.ts",
-    "*.env": "$(capture).env.*",
-    "README.md": "README*,CHANGELOG*,LICENSE,CNAME",
-    "package.json": "pnpm-lock.yaml,pnpm-workspace.yaml,.gitattributes,.gitignore,.gitpod.yml,.npmrc,.browserslistrc,.node-version,.git*,.tazerc.json",
-    "oxlint.config.ts": ".eslintignore,.stylelintignore,.commitlintrc.*,stylelint.config.*,.lintstagedrc.mjs,cspell.json,lefthook.yml,oxfmt.config.*,eslint.config.*"
-  },
-  "commentTranslate.hover.enabled": false,
-  "commentTranslate.multiLineMerge": true,
-  "vue.server.hybridMode": true,
-  "vitest.disableWorkspaceWarning": true,
-  "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "editor.linkedEditing": true, // 自动同步更改html标签,
-  "vscodeCustomCodeColor.highlightValue": "v-access", // v-access显示的颜色
-  "vscodeCustomCodeColor.highlightValueColor": "#CCFFFF",
-  "cSpell.words": [
-    "archiver",
-    "axios",
-    "Cascader",
-    "dotenv",
-    "isequal",
-    "jspm",
-    "napi",
-    "nolebase",
-    "rollup",
-    "Spel",
-    "tinymce",
-    "vitest"
-  ],
-  "unocss.disable": true
+  "i18n-ally.namespace": true
 }
