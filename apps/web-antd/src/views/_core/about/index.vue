@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { About } from '@vben/common-ui';
+import { About } from '@vben/common-ui'
 
-defineOptions({ name: 'About' });
+defineOptions({
+  name: 'About'
+})
 </script>
 
 <template>

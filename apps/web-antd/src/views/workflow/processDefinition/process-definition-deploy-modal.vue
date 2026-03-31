@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import type { UploadFile } from 'antdv-next';
+import type { UploadFile } from 'antdv-next'
 
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-import { useVbenModal } from '@vben/common-ui';
+import { useVbenModal } from '@vben/common-ui'
 
-import { InboxOutlined } from '@antdv-next/icons';
-import { Upload } from 'antdv-next';
+import { InboxOutlined } from '@antdv-next/icons'
+import { Upload } from 'antdv-next'
 
-import { workflowDefinitionImport } from '#/api/workflow/definition';
+import { workflowDefinitionImport } from '#/api/workflow/definition'
 
-const emit = defineEmits<{ reload: [] }>();
+const emit = defineEmits<{ reload: [] }>()
 
-const UploadDragger = Upload.Dragger;
+const UploadDragger = Upload.Dragger
 
 const [BasicModal, modalApi] = useVbenModal({
   onCancel: handleCancel,
-  onConfirm: handleSubmit,
-});
+  onConfirm: handleSubmit
+})
 
-const fileList = ref<UploadFile[]>([]);
+const fileList = ref<UploadFile[]>([])
 
 async function handleSubmit() {
   try {
-    modalApi.modalLoading(true);
+    modalApi.modalLoading(true)
     if (fileList.value.length !== 1) {
-      handleCancel();
-      return;
+      handleCancel()
+      return
     }
     const data = {
       file: fileList.value[0]!.originFileObj as Blob,
-      category: modalApi.getData().category,
-    };
-    await workflowDefinitionImport(data);
-    emit('reload');
-    handleCancel();
+      category: modalApi.getData().category
+    }
+    await workflowDefinitionImport(data)
+    emit('reload')
+    handleCancel()
   } catch (error) {
-    console.warn(error);
-    modalApi.close();
+    console.warn(error)
+    modalApi.close()
   } finally {
-    modalApi.modalLoading(false);
+    modalApi.modalLoading(false)
   }
 }
 
 function handleCancel() {
-  modalApi.close();
-  fileList.value = [];
+  modalApi.close()
+  fileList.value = []
 }
 </script>
 
@@ -65,7 +65,7 @@ function handleCancel() {
       accept="application/json"
     >
       <p class="ant-upload-drag-icon flex items-center justify-center">
-        <InboxOutlined class="size-[48px] text-primary" />
+        <InboxOutlined class="size-12 text-primary" />
       </p>
       <p class="ant-upload-text">点击或者拖拽到此处上传[json]文件</p>
     </UploadDragger>

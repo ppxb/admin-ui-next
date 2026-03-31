@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const typescript: OxlintConfig = {
   rules: {
@@ -21,8 +21,8 @@ const typescript: OxlintConfig = {
     'typescript/no-var-requires': 'error',
     'typescript/restrict-template-expressions': 'off',
     'typescript/triple-slash-reference': 'error',
-    'typescript/unbound-method': 'off',
-  },
-};
+    'typescript/unbound-method': 'off'
+  }
+}
 
-export { typescript };
+export { typescript }

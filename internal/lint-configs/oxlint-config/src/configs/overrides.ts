@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const overrides: OxlintConfig = {
   overrides: [
@@ -6,8 +6,8 @@ const overrides: OxlintConfig = {
       files: ['*.d.ts', '**/*.d.ts'],
       rules: {
         'import/no-unassigned-import': 'off',
-        'typescript/triple-slash-reference': 'off',
-      },
+        'typescript/triple-slash-reference': 'off'
+      }
     },
     {
       files: [
@@ -50,23 +50,23 @@ const overrides: OxlintConfig = {
         '**/*.benchmark.ts',
         '**/*.benchmark.cts',
         '**/*.benchmark.mts',
-        '**/*.benchmark.tsx',
+        '**/*.benchmark.tsx'
       ],
       rules: {
-        'no-console': 'off',
-      },
+        'no-console': 'off'
+      }
     },
     {
       files: ['packages/@core/base/shared/src/utils/inference.ts'],
       rules: {
-        'vue/prefer-import-from-vue': 'off',
-      },
+        'vue/prefer-import-from-vue': 'off'
+      }
     },
     {
       files: ['packages/@core/ui-kit/menu-ui/src/sub-menu.vue'],
       rules: {
-        'import/no-self-import': 'off',
-      },
+        'import/no-self-import': 'off'
+      }
     },
     {
       files: [
@@ -85,14 +85,14 @@ const overrides: OxlintConfig = {
         'internal/**/*.ts',
         'internal/**/*.cts',
         'internal/**/*.mts',
-        'internal/**/*.tsx',
+        'internal/**/*.tsx'
       ],
       rules: {
         'no-console': 'off',
-        'unicorn/no-process-exit': 'off',
-      },
-    },
-  ],
-};
+        'unicorn/no-process-exit': 'off'
+      }
+    }
+  ]
+}
 
-export { overrides };
+export { overrides }

@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const importPluginConfig: OxlintConfig = {
   rules: {
@@ -11,8 +11,8 @@ const importPluginConfig: OxlintConfig = {
     'import/no-named-default': 'error',
     'import/no-self-import': 'error',
     'import/no-unassigned-import': 'off',
-    'import/no-webpack-loader-syntax': 'error',
-  },
-};
+    'import/no-webpack-loader-syntax': 'error'
+  }
+}
 
-export { importPluginConfig };
+export { importPluginConfig }

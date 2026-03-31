@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const test: OxlintConfig = {
   rules: {
@@ -8,16 +8,16 @@ const test: OxlintConfig = {
       'error',
       {
         fn: 'it',
-        withinDescribe: 'it',
-      },
+        withinDescribe: 'it'
+      }
     ],
     'vitest/hoisted-apis-on-top': 'off',
     'vitest/no-focused-tests': 'error',
     'vitest/no-identical-title': 'error',
     'vitest/no-import-node-test': 'error',
     'vitest/prefer-hooks-in-order': 'error',
-    'vitest/prefer-lowercase-title': 'error',
-  },
-};
+    'vitest/prefer-lowercase-title': 'error'
+  }
+}
 
-export { test };
+export { test }

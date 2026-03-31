@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const unicorn: OxlintConfig = {
   rules: {
@@ -7,8 +7,8 @@ const unicorn: OxlintConfig = {
     'unicorn/no-single-promise-in-promise-methods': 'off',
     'unicorn/no-useless-spread': 'off',
     'unicorn/prefer-global-this': 'off',
-    'unicorn/prefer-module': 'error',
-  },
-};
+    'unicorn/prefer-module': 'error'
+  }
+}
 
-export { unicorn };
+export { unicorn }
