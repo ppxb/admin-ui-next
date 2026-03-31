@@ -3,45 +3,63 @@ import { join, normalize } from 'node:path'
 
 const rootDir = process.cwd()
 
-// 特殊目录，避免进入这些目录进行清理
+// 并发数量
+const CONCURRENCY_LIMIT = 10
+
+// 特殊目录，无需清理
 const SKIP_DIRS = new Set(['.DS_Store', '.git', '.idea', '.vscode'])
 
-class Semaphore {
-  constructor(limit) {
-    this.limit = limit
-    this.queue = []
-    this.active = 0
+/**
+ * 处理单个文件/目录项
+ * @param {string} currentDir - 当前目录路径
+ * @param {string} item - 文件/目录名
+ * @param {string[]} targets - 要删除的目标列表
+ * @param {number} _depth - 当前递归深度
+ * @returns {Promise<boolean>} - 是否需要进一步递归处理
+ */
+async function processItem(currentDir, item, targets, _depth) {
+  // 跳过特殊目录
+  if (SKIP_DIRS.has(item)) {
+    return false
   }
 
-  acquire() {
-    return new Promise(resolve => {
-      if (this.active < this.limit) {
-        this.active++
-        resolve()
-      } else {
-        this.queue.push(resolve)
-      }
-    })
-  }
+  try {
+    const itemPath = normalize(join(currentDir, item))
 
-  release() {
-    this.active--
-    if (this.queue.length) {
-      this.active++
-      this.queue.shift()
+    if (targets.includes(item)) {
+      // 匹配到目标目录或文件时直接删除
+      await fs.rm(itemPath, { force: true, recursive: true })
+      console.log(`✅ Deleted: ${itemPath}`)
+      // 已删除，无需递归
+      return false
     }
+    // 使用 readdir 的 withFileTypes 选项，避免额外的 lstat 调用
+    // 可能需要递归，由调用方决定
+    return true
+  } catch (error) {
+    // 更详细的错误信息
+    if (error.code === 'ENOENT') {
+      // 文件不存在，可能已被删除，这是正常情况
+      return false
+    } else if (error.code === 'EPERM' || error.code === 'EACCES') {
+      console.error(`❌ Permission denied: ${item} in ${currentDir}`)
+    } else {
+      console.error(
+        `❌ Error handling item ${item} in ${currentDir}: ${error.message}`
+      )
+    }
+    return false
   }
 }
 
-const sem = new Semaphore(10)
-
 /**
- * 递归查找并删除目标目录
+ * 递归查找并删除目标目录（并发优化版本）
  * @param {string} currentDir - 当前遍历的目录路径
- * @param {Set<string>} targets - 要删除的目标集合
- * @param {number} depth - 当前递归深度
+ * @param {string[]} targets - 要删除的目标列表
+ * @param {number} depth - 当前递归深度，避免过深递归
  */
 async function cleanTargetsRecursively(currentDir, targets, depth = 0) {
+  // 限制递归深度，避免无限递归
   if (depth > 10) {
     console.warn(`Max recursion depth reached at: ${currentDir}`)
     return
@@ -49,62 +67,65 @@ async function cleanTargetsRecursively(currentDir, targets, depth = 0) {
 
   let dirents
   try {
+    // 使用 withFileTypes 选项，一次性获取文件类型信息，避免后续 lstat 调用
     dirents = await fs.readdir(currentDir, { withFileTypes: true })
   } catch (error) {
+    // 如果无法读取目录，可能已被删除或权限不足
     console.warn(`Cannot read directory ${currentDir}: ${error.message}`)
     return
   }
 
-  for (const dirent of dirents) {
-    const item = dirent.name
-    if (SKIP_DIRS.has(item)) continue
+  // 分批处理，控制并发数量
+  for (let i = 0; i < dirents.length; i += CONCURRENCY_LIMIT) {
+    const batch = dirents.slice(i, i + CONCURRENCY_LIMIT)
 
-    const itemPath = normalize(join(currentDir, item))
+    const tasks = batch.map(async dirent => {
+      const item = dirent.name
+      const shouldRecurse = await processItem(currentDir, item, targets, depth)
 
-    if (targets.has(item)) {
-      await sem.acquire()
-      try {
-        await fs.rm(itemPath, { force: true, recursive: true })
-        console.log(`✅ Deleted: ${itemPath}`)
-      } catch (error) {
-        if (error.code === 'ENOENT') continue
-        if (error.code === 'EPERM' || error.code === 'EACCES') {
-          console.error(`❌ Permission denied: ${itemPath}`)
-        } else {
-          console.error(`❌ Error deleting ${itemPath}: ${error.message}`)
-        }
-      } finally {
-        sem.release()
+      // 如果是目录且没有被删除，则递归处理
+      if (shouldRecurse && dirent.isDirectory()) {
+        const itemPath = normalize(join(currentDir, item))
+        return cleanTargetsRecursively(itemPath, targets, depth + 1)
       }
-      continue
-    }
+      return null
+    })
 
-    if (dirent.isDirectory()) {
-      await cleanTargetsRecursively(itemPath, targets, depth + 1)
+    // 并发执行当前批次的任务
+    const results = await Promise.allSettled(tasks)
+
+    // 检查是否有失败的任务
+    const failedTasks = results.filter(result => result.status === 'rejected')
+    if (failedTasks.length > 0) {
+      console.warn(
+        `${failedTasks.length} tasks failed in batch starting at index ${i} in directory: ${currentDir}`
+      )
     }
   }
 }
 
-// 要删除的目录及文件名称
-const targets = ['node_modules', 'dist', '.turbo', 'dist.zip']
-const deleteLockFile = process.argv.includes('--del-lock')
-if (deleteLockFile) {
-  cleanupTargets.push('pnpm-lock.yaml')
-}
+;(async function startCleanup() {
+  const targets = ['node_modules', 'dist', '.turbo', 'dist.zip']
+  const cleanupTargets = [...targets]
+  const deleteLockFile = process.argv.includes('--del-lock')
 
-const targetsSet = new Set(targets)
-console.log(
-  `🚀 Starting cleanup of targets: ${targets.join(', ')} from root: ${rootDir}`
-)
+  if (deleteLockFile) {
+    cleanupTargets.push('pnpm-lock.yaml')
+  }
 
-const startTime = Date.now()
+  console.log(
+    `🚀 Starting cleanup of targets: ${cleanupTargets.join(', ')} from root: ${rootDir}`
+  )
 
-try {
-  console.log('📊 Scanning for cleanup targets...')
-  await cleanTargetsRecursively(rootDir, targetsSet)
-  const duration = ((Date.now() - startTime) / 1000).toFixed(2)
-  console.log(`✨ Cleanup process completed successfully in ${duration}s`)
-} catch (error) {
-  console.error(`💥 Unexpected error during cleanup: ${error.message}`)
-  process.exit(1)
-}
+  const startTime = Date.now()
+
+  try {
+    console.log('📊 Scanning for cleanup targets...')
+    await cleanTargetsRecursively(rootDir, cleanupTargets)
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2)
+    console.log(`✨ Cleanup process completed successfully in ${duration}s`)
+  } catch (error) {
+    console.error(`💥 Unexpected error during cleanup: ${error.message}`)
+    process.exit(1)
+  }
+})()
