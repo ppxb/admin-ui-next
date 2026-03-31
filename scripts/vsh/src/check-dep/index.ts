@@ -21,7 +21,6 @@ const DEFAULT_CONFIG = {
   ignorePackages: [
     '@vben/backend-mock',
     '@vben/commitlint-config',
-    '@vben/eslint-config',
     '@vben/node-utils',
     '@vben/oxfmt-config',
     '@vben/oxlint-config',
