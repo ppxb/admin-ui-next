@@ -8,7 +8,11 @@ const oxfmtConfig: OxfmtConfig = defineOxfmtConfig({
   proseWrap: 'never',
   singleQuote: true,
   arrowParens: 'avoid',
-  trailingComma: 'none'
+  trailingComma: 'none',
+  sortTailwindcss: {
+    functions: ['clsx', 'cn'],
+    preserveWhitespace: true
+  }
 })
 
 function defineConfig(config: OxfmtConfig = {}): OxfmtConfig {
