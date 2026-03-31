@@ -1,22 +1,12 @@
 {
   "name": "@vben/oxfmt-config",
-  "version": "5.7.0",
+  "version": "0.0.1",
   "private": true,
-  "homepage": "https://github.com/vbenjs/vue-vben-admin",
-  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
-    "directory": "internal/lint-configs/oxfmt-config"
-  },
   "license": "MIT",
-  "type": "module",
-  "scripts": {
-    "stub": "pnpm exec tsdown"
-  },
   "files": [
     "dist"
   ],
+  "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -25,6 +15,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
     }
+  },
+  "scripts": {
+    "stub": "pnpm exec tsdown"
   },
   "dependencies": {
     "oxfmt": "catalog:"

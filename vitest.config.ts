@@ -1,6 +1,6 @@
-import Vue from '@vitejs/plugin-vue';
-import VueJsx from '@vitejs/plugin-vue-jsx';
-import { configDefaults, defineConfig } from 'vitest/config';
+import Vue from '@vitejs/plugin-vue'
+import VueJsx from '@vitejs/plugin-vue-jsx'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [Vue(), VueJsx()],
@@ -11,9 +11,9 @@ export default defineConfig({
         settings: {
           // happy-dom v20+ disables JS evaluation by default (security fix).
           // Treat disabled script loading as success to preserve test behavior.
-          handleDisabledFileLoadingAsSuccess: true,
-        },
-      },
+          handleDisabledFileLoadingAsSuccess: true
+        }
+      }
     },
     exclude: [
       ...configDefaults.exclude,
@@ -21,8 +21,8 @@ export default defineConfig({
       '**/dist/**',
       '**/.{idea,git,cache,output,temp}/**',
       '**/node_modules/**',
-      '**/{stylelint,eslint}.config.*',
-      '**/{oxfmt,oxlint}.config.*',
-    ],
-  },
-});
+      '**/{stylelint}.config.*',
+      '**/{oxfmt,oxlint}.config.*'
+    ]
+  }
+})

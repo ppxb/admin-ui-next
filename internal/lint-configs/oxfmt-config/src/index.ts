@@ -1,39 +1,23 @@
-import { defineConfig as defineOxfmtConfig } from 'oxfmt';
+import { defineConfig as defineOxfmtConfig } from 'oxfmt'
 
-type OxfmtConfig = Parameters<typeof defineOxfmtConfig>[0];
+type OxfmtConfig = Parameters<typeof defineOxfmtConfig>[0]
 
 const oxfmtConfig: OxfmtConfig = defineOxfmtConfig({
   printWidth: 80,
+  semi: false,
   proseWrap: 'never',
-  semi: true,
   singleQuote: true,
-  sortPackageJson: false,
-  trailingComma: 'all',
-  overrides: [
-    {
-      files: [
-        '*.json',
-        '*.json5',
-        '*.jsonc',
-        '*.code-workspace',
-        '**/*.json',
-        '**/*.json5',
-        '**/*.jsonc',
-        '**/*.code-workspace',
-      ],
-      options: {
-        trailingComma: 'none',
-      },
-    },
-  ],
-});
+  arrowParens: 'avoid',
+  trailingComma: 'none'
+})
 
 function defineConfig(config: OxfmtConfig = {}): OxfmtConfig {
   return defineOxfmtConfig({
     ...oxfmtConfig,
-    ...config,
-  });
+    ...config
+  })
 }
 
-export { defineConfig, oxfmtConfig };
-export type { OxfmtConfig };
+export { defineConfig, oxfmtConfig }
+
+export type { OxfmtConfig }

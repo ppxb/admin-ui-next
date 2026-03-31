@@ -1,27 +1,27 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 const javascript: OxlintConfig = {
   categories: {
     correctness: 'error',
-    suspicious: 'warn',
+    suspicious: 'warn'
   },
   env: {
     browser: true,
     es2021: true,
-    node: true,
+    node: true
   },
   globals: {
     document: 'readonly',
     navigator: 'readonly',
-    window: 'readonly',
+    window: 'readonly'
   },
   rules: {
     'accessor-pairs': [
       'error',
       {
         enforceForClassMembers: true,
-        setWithoutGet: true,
-      },
+        setWithoutGet: true
+      }
     ],
     'array-callback-return': 'error',
     'block-scoped-var': 'error',
@@ -33,8 +33,8 @@ const javascript: OxlintConfig = {
       {
         capIsNew: false,
         newIsCap: true,
-        properties: true,
-      },
+        properties: true
+      }
     ],
     'no-alert': 'error',
     'no-array-constructor': 'error',
@@ -64,8 +64,8 @@ const javascript: OxlintConfig = {
     'eslint/no-empty-function': [
       'error',
       {
-        allow: ['arrowFunctions', 'functions', 'methods'],
-      },
+        allow: ['arrowFunctions', 'functions', 'methods']
+      }
     ],
     'no-template-curly-in-string': 'error',
     'no-throw-literal': 'error',
@@ -75,15 +75,15 @@ const javascript: OxlintConfig = {
       {
         allowShortCircuit: true,
         allowTaggedTemplates: true,
-        allowTernary: true,
-      },
+        allowTernary: true
+      }
     ],
     'eslint/no-unused-vars': [
       'error',
       {
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
+        varsIgnorePattern: '^_'
+      }
     ],
     'no-var': 'error',
     'no-eval': 'error',
@@ -92,7 +92,7 @@ const javascript: OxlintConfig = {
     'no-restricted-globals': [
       'error',
       { message: 'Use `globalThis` instead.', name: 'global' },
-      { message: 'Use `globalThis` instead.', name: 'self' },
+      { message: 'Use `globalThis` instead.', name: 'self' }
     ],
     'no-useless-call': 'error',
     'no-useless-computed-key': 'error',
@@ -103,31 +103,31 @@ const javascript: OxlintConfig = {
       'always',
       {
         avoidQuotes: true,
-        ignoreConstructors: false,
-      },
+        ignoreConstructors: false
+      }
     ],
     'one-var': ['error', { initialized: 'never' }],
     'prefer-const': [
       'error',
       {
         destructuring: 'all',
-        ignoreReadBeforeAssign: true,
-      },
+        ignoreReadBeforeAssign: true
+      }
     ],
     'eslint/prefer-arrow-callback': [
       'error',
       {
         allowNamedFunctions: false,
-        allowUnboundThis: true,
-      },
+        allowUnboundThis: true
+      }
     ],
     'prefer-exponentiation-operator': 'error',
     'prefer-promise-reject-errors': 'error',
     'eslint/prefer-regex-literals': [
       'error',
       {
-        disallowRedundantWrapping: true,
-      },
+        disallowRedundantWrapping: true
+      }
     ],
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
@@ -139,18 +139,18 @@ const javascript: OxlintConfig = {
       'error',
       {
         enforceForIndexOf: true,
-        enforceForSwitchCase: true,
-      },
+        enforceForSwitchCase: true
+      }
     ],
     'valid-typeof': [
       'error',
       {
-        requireStringLiterals: true,
-      },
+        requireStringLiterals: true
+      }
     ],
     'vars-on-top': 'error',
-    yoda: ['error', 'never'],
-  },
-};
+    yoda: ['error', 'never']
+  }
+}
 
-export { javascript };
+export { javascript }
