@@ -2,6 +2,7 @@
   "name": "admin-ui-next",
   "version": "0.0.1",
   "private": true,
+  "packageManager": "pnpm@10.32.1",
   "keywords": [
     "monorepo",
     "vue",
@@ -89,6 +90,5 @@
   "engines": {
     "node": "^20.19.0 || ^22.18.0 || ^24.0.0",
     "pnpm": ">=10.0.0"
-  },
-  "packageManager": "pnpm@10.32.1"
+  }
 }
