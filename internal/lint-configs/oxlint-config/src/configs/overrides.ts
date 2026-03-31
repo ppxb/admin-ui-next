@@ -6,7 +6,8 @@ const overrides: OxlintConfig = {
       files: ['*.d.ts', '**/*.d.ts'],
       rules: {
         'import/no-unassigned-import': 'off',
-        'typescript/triple-slash-reference': 'off'
+        'typescript/triple-slash-reference': 'off',
+        'unicorn/require-module-specifiers': 'off'
       }
     },
     {
