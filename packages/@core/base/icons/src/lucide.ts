@@ -5,6 +5,7 @@ export {
   ArrowRightLeft,
   ArrowRightToLine,
   ArrowUp,
+  ArrowDownUp,
   ArrowUpToLine,
   Bell,
   BookOpenText,
@@ -67,5 +68,5 @@ export {
   SunMoon,
   SwatchBook,
   UserRoundPen,
-  X,
-} from 'lucide-vue-next';
+  X
+} from 'lucide-vue-next'

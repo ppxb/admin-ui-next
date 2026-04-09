@@ -1,159 +1,163 @@
 <script setup lang="ts">
-import type { MenuRecordRaw } from '@vben/types';
+import type { MenuRecordRaw } from '@vben/types'
 
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useMagicKeys, whenever } from '@vueuse/core'
 
 import {
-  ArrowDown,
-  ArrowUp,
+  ArrowDownUp,
   CornerDownLeft,
   MdiKeyboardEsc,
-  Search,
-} from '@vben/icons';
-import { $t } from '@vben/locales';
-import { isWindowsOs } from '@vben/utils';
+  Search
+} from '@vben/icons'
+import { $t } from '@vben/locales'
+import { isWindowsOs } from '@vben/utils'
+import { useVbenModal } from '@vben-core/popup-ui'
 
-import { useVbenModal } from '@vben-core/popup-ui';
-
-import { useMagicKeys, whenever } from '@vueuse/core';
-
-import SearchPanel from './search-panel.vue';
+import SearchPanel from './search-panel.vue'
 
 defineOptions({
-  name: 'GlobalSearch',
-});
+  name: 'GlobalSearch'
+})
 
 const props = withDefaults(
   defineProps<{ enableShortcutKey?: boolean; menus?: MenuRecordRaw[] }>(),
   {
     enableShortcutKey: true,
-    menus: () => [],
-  },
-);
+    menus: () => []
+  }
+)
 
-const keyword = ref('');
-const searchInputRef = ref<HTMLInputElement>();
+const keyword = ref('')
+const searchInputRef = ref<HTMLInputElement>()
 
 const [Modal, modalApi] = useVbenModal({
   onCancel() {
-    modalApi.close();
+    modalApi.close()
   },
   onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      keyword.value = '';
+      keyword.value = ''
     }
-  },
-});
-const open = modalApi.useStore((state) => state.isOpen);
+  }
+})
+const open = modalApi.useStore(state => state.isOpen)
 
 function handleClose() {
-  modalApi.close();
-  keyword.value = '';
+  modalApi.close()
+  keyword.value = ''
 }
 
-const keys = useMagicKeys();
-const cmd = isWindowsOs() ? keys['ctrl+k'] : keys['cmd+k'];
+const keys = useMagicKeys()
+const cmd = isWindowsOs() ? keys['ctrl+k'] : keys['cmd+k']
 if (cmd) {
   whenever(cmd, () => {
     if (props.enableShortcutKey) {
-      modalApi.open();
+      modalApi.open()
     }
-  });
+  })
 }
 
 whenever(open, () => {
   nextTick(() => {
-    searchInputRef.value?.focus();
-  });
-});
+    searchInputRef.value?.focus()
+  })
+})
 
 const preventDefaultBrowserSearchHotKey = (event: KeyboardEvent) => {
   if (event.key?.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
-    event.preventDefault();
+    event.preventDefault()
   }
-};
+}
 
 const toggleKeydownListener = () => {
   if (props.enableShortcutKey) {
-    window.addEventListener('keydown', preventDefaultBrowserSearchHotKey);
+    window.addEventListener('keydown', preventDefaultBrowserSearchHotKey)
   } else {
-    window.removeEventListener('keydown', preventDefaultBrowserSearchHotKey);
+    window.removeEventListener('keydown', preventDefaultBrowserSearchHotKey)
   }
-};
+}
 
 const toggleOpen = () => {
-  open.value ? modalApi.close() : modalApi.open();
-};
+  open.value ? modalApi.close() : modalApi.open()
+}
 
-watch(() => props.enableShortcutKey, toggleKeydownListener);
+watch(() => props.enableShortcutKey, toggleKeydownListener)
 
 onMounted(() => {
-  toggleKeydownListener();
+  toggleKeydownListener()
 
   onUnmounted(() => {
-    window.removeEventListener('keydown', preventDefaultBrowserSearchHotKey);
-  });
-});
+    window.removeEventListener('keydown', preventDefaultBrowserSearchHotKey)
+  })
+})
 </script>
 
 <template>
-  <div>
-    <Modal
-      :fullscreen-button="false"
-      class="w-150"
-      header-class="py-2 border-b"
-    >
-      <template #title>
-        <div class="flex items-center">
-          <Search class="mr-2 size-4 text-muted-foreground" />
-          <input
-            ref="searchInputRef"
-            v-model="keyword"
-            :placeholder="$t('ui.widgets.search.searchNavigate')"
-            class="ring-none w-[80%] rounded-md border border-none bg-transparent p-2 pl-0 text-sm font-normal ring-0 ring-offset-transparent outline-hidden placeholder:text-muted-foreground focus-visible:ring-transparent"
-          />
-        </div>
-      </template>
+  <Modal
+    :fullscreen-button="false"
+    class="bg-background w-150 rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
+  >
+    <template #title>
+      <div
+        class="bg-input/50 border-input m-2 flex h-9 items-center gap-2 rounded-xl border px-3"
+      >
+        <Search class="text-muted-foreground size-4" />
+        <input
+          ref="searchInputRef"
+          v-model="keyword"
+          :placeholder="$t('ui.widgets.search.searchNavigate')"
+          class="placeholder:text-muted-foreground w-full p-2 pl-0 text-sm outline-none focus-visible:ring-transparent"
+        />
+      </div>
+    </template>
 
-      <SearchPanel :keyword="keyword" :menus="menus" @close="handleClose" />
-      <template #footer>
-        <div class="flex w-full justify-start text-xs">
-          <div class="mr-2 flex items-center">
-            <CornerDownLeft class="mr-1 size-3" />
-            {{ $t('ui.widgets.search.select') }}
-          </div>
-          <div class="mr-2 flex items-center">
-            <ArrowUp class="mr-1 size-3" />
-            <ArrowDown class="mr-1 size-3" />
-            {{ $t('ui.widgets.search.navigate') }}
-          </div>
-          <div class="flex items-center">
-            <MdiKeyboardEsc class="mr-1 size-3" />
-            {{ $t('ui.widgets.search.close') }}
-          </div>
+    <SearchPanel
+      :keyword="keyword"
+      :menus="menus"
+      @close="handleClose"
+      class="m-2"
+    />
+
+    <template #footer>
+      <div
+        class="text-muted-foreground flex h-10 w-full justify-center gap-4! rounded-br-2xl rounded-bl-2xl bg-neutral-50 text-xs dark:bg-neutral-800"
+      >
+        <div class="flex items-center gap-2">
+          <CornerDownLeft class="size-3" />
+          {{ $t('ui.widgets.search.select') }}
         </div>
-      </template>
-    </Modal>
-    <div
-      class="group flex h-8 cursor-pointer items-center gap-3 rounded-2xl border-none bg-none px-2 py-0.5 outline-hidden md:bg-accent"
-      @click="toggleOpen()"
+        <div class="flex items-center gap-2">
+          <ArrowDownUp class="size-3" />
+          {{ $t('ui.widgets.search.navigate') }}
+        </div>
+        <div class="flex items-center gap-2">
+          <MdiKeyboardEsc class="size-4" />
+          {{ $t('ui.widgets.search.close') }}
+        </div>
+      </div>
+    </template>
+  </Modal>
+
+  <div
+    class="group md:bg-accent flex h-8 cursor-pointer items-center gap-3 rounded-2xl border-none bg-none px-2 py-0.5 outline-hidden"
+    @click="toggleOpen()"
+  >
+    <Search
+      class="text-muted-foreground group-hover:text-foreground size-4 group-hover:opacity-100"
+    />
+    <span
+      class="text-muted-foreground group-hover:text-foreground hidden text-xs duration-300 md:block"
     >
-      <Search
-        class="size-4 text-muted-foreground group-hover:text-foreground group-hover:opacity-100"
-      />
-      <span
-        class="hidden text-xs text-muted-foreground duration-300 group-hover:text-foreground md:block"
-      >
-        {{ $t('ui.widgets.search.title') }}
-      </span>
-      <span
-        v-if="enableShortcutKey"
-        class="relative hidden rounded-sm rounded-r-xl border-foreground/60 bg-background px-1.5 py-1 text-xs leading-none text-muted-foreground group-hover:text-foreground group-hover:opacity-100 md:block"
-      >
-        {{ isWindowsOs() ? 'Ctrl' : '⌘' }}
-        <kbd>K</kbd>
-      </span>
-      <span v-else></span>
-    </div>
+      {{ $t('ui.widgets.search.title') }}
+    </span>
+    <span
+      v-if="enableShortcutKey"
+      class="border-foreground/60 bg-background text-muted-foreground group-hover:text-foreground relative hidden rounded-sm rounded-r-xl px-1.5 py-1 text-xs leading-none group-hover:opacity-100 md:block"
+    >
+      {{ isWindowsOs() ? 'Ctrl' : '⌘' }}
+      <kbd>K</kbd>
+    </span>
+    <span v-else></span>
   </div>
 </template>
