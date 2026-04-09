@@ -290,7 +290,6 @@ onMounted(() => {
           class="group flex-center mb-2 w-full cursor-pointer rounded-xl border px-2 py-1.5 text-sm"
           @click="handleEnter(index)"
           @mouseenter="handleMouseenter(index)"
-          @mouseleave="handleMouseleave"
         >
           <VbenIcon :icon="item.icon" class="mr-2 size-5 shrink-0" fallback />
 

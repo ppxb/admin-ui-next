@@ -79,7 +79,11 @@ const toggleKeydownListener = () => {
 }
 
 const toggleOpen = () => {
-  open.value ? modalApi.close() : modalApi.open()
+  if (open.value) {
+    modalApi.close()
+  } else {
+    modalApi.open()
+  }
 }
 
 watch(() => props.enableShortcutKey, toggleKeydownListener)
@@ -97,7 +101,6 @@ onMounted(() => {
   <Modal
     :fullscreen-button="false"
     :closable="false"
-    :centered="true"
     class="bg-background w-130! max-w-[92vw] rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
   >
     <template #title>
