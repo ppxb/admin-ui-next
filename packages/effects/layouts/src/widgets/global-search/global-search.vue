@@ -96,18 +96,20 @@ onMounted(() => {
 <template>
   <Modal
     :fullscreen-button="false"
-    class="bg-background w-150 rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
+    :closable="false"
+    :centered="true"
+    class="bg-background w-130! max-w-[92vw] rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
   >
     <template #title>
       <div
         class="bg-input/50 border-input m-2 flex h-9 items-center gap-2 rounded-xl border px-3"
       >
-        <Search class="text-muted-foreground size-4" />
+        <Search class="size-4" />
         <input
           ref="searchInputRef"
           v-model="keyword"
           :placeholder="$t('ui.widgets.search.searchNavigate')"
-          class="placeholder:text-muted-foreground w-full p-2 pl-0 text-sm outline-none focus-visible:ring-transparent"
+          class="w-full p-2 pl-0 text-sm font-normal outline-none focus-visible:ring-transparent"
         />
       </div>
     </template>
@@ -158,6 +160,5 @@ onMounted(() => {
       {{ isWindowsOs() ? 'Ctrl' : '⌘' }}
       <kbd>K</kbd>
     </span>
-    <span v-else></span>
   </div>
 </template>

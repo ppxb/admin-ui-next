@@ -5,7 +5,7 @@ import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { onKeyStroke, useLocalStorage, useThrottleFn } from '@vueuse/core'
 
-import { SearchX, X } from '@vben/icons'
+import { X } from '@vben/icons'
 import { $t, useI18n } from '@vben/locales'
 import { mapTree, traverseTreeValues, uniqueByField } from '@vben/utils'
 import { VbenIcon, VbenScrollbar } from '@vben-core/shadcn-ui'
@@ -153,6 +153,10 @@ function handleMouseenter(index: number) {
   activeIndex.value = index
 }
 
+function handleMouseleave() {
+  activeIndex.value = -1
+}
+
 function removeItem(index: number) {
   const target = displayResults.value[index]
   if (!target) {
@@ -245,29 +249,28 @@ onMounted(() => {
 
 <template>
   <VbenScrollbar>
-    <div class="flex! h-full justify-center px-2 sm:max-h-112.5">
+    <div class="flex! max-h-75 min-h-80 justify-center">
       <div
         v-if="keyword && displayResults.length === 0"
-        class="text-muted-foreground text-center"
+        class="text-muted-foreground flex items-center justify-center text-center"
       >
-        <SearchX class="mx-auto mt-4 size-12" />
-        <p class="mt-6 mb-10 text-xs">
+        <p class="text-sm">
           {{ $t('ui.widgets.search.noResults') }}
-          <span class="text-foreground text-sm font-medium">
-            "{{ keyword }}"
-          </span>
+          <span class="text-foreground"> "{{ keyword }}" </span>
         </p>
       </div>
       <div
         v-if="!keyword && displayResults.length === 0"
-        class="text-muted-foreground text-center"
+        class="text-muted-foreground flex items-center justify-center text-center text-sm"
       >
-        <p class="my-10 text-xs">
-          {{ $t('ui.widgets.search.noRecent') }}
-        </p>
+        {{ $t('ui.widgets.search.noRecent') }}
       </div>
 
-      <ul v-show="displayResults.length > 0" class="w-full">
+      <ul
+        v-show="displayResults.length > 0"
+        class="w-full"
+        @mouseleave="handleMouseleave"
+      >
         <li
           v-if="searchHistory.length > 0 && !keyword"
           class="text-muted-foreground mb-2 text-xs"
@@ -279,20 +282,22 @@ onMounted(() => {
           :key="item.path"
           :class="
             activeIndex === index
-              ? 'active bg-primary text-primary-foreground'
-              : ''
+              ? 'bg-input/50 border-input'
+              : 'border-transparent'
           "
           :data-index="index"
           :data-search-item="index"
-          class="group flex-center bg-accent mb-3 w-full cursor-pointer rounded-lg p-4"
+          class="group flex-center mb-2 w-full cursor-pointer rounded-xl border px-2 py-1.5 text-sm"
           @click="handleEnter(index)"
           @mouseenter="handleMouseenter(index)"
+          @mouseleave="handleMouseleave"
         >
           <VbenIcon :icon="item.icon" class="mr-2 size-5 shrink-0" fallback />
 
           <span class="flex-1">{{ item.name }}</span>
           <div
-            class="flex-center hover:text-primary-foreground dark:hover:bg-accent rounded-full p-1 hover:scale-110"
+            v-if="!keyword"
+            class="flex-center hover:text-muted-foreground rounded-full"
             @click.stop="removeItem(index)"
           >
             <X class="size-4" />

@@ -238,7 +238,7 @@ function handleClosed() {
       :append-to="getAppendTo"
       :class="
         cn(
-          'inset-x-0 top-[10vh] mx-auto flex max-h-[80%] w-130 flex-col p-0',
+          'inset-x-0 top-[10vh] mx-auto flex max-h-[80%] w-10 flex-col p-0',
           shouldFullscreen ? 'sm:rounded-none' : 'sm:rounded-(--radius)',
           modalClass,
           {
@@ -305,7 +305,7 @@ function handleClosed() {
       <div
         ref="wrapperRef"
         :class="
-          cn('relative min-h-40 flex-1 overflow-y-auto p-3', contentClass, {
+          cn(contentClass, {
             'pointer-events-none': showLoading || submitting
           })
         "
