@@ -101,7 +101,7 @@ onMounted(() => {
   <Modal
     :fullscreen-button="false"
     :closable="false"
-    class="bg-background w-130! max-w-[92vw] rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
+    class="bg-background top-0! bottom-0! my-auto! h-fit! w-130! max-w-[92vw] rounded-2xl! ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800"
   >
     <template #title>
       <div
