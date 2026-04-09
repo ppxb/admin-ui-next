@@ -1,17 +1,15 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import type { MenuRecordRaw } from '@vben/types'
 
-import { nextTick, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { onKeyStroke, useLocalStorage, useThrottleFn } from '@vueuse/core'
 
 import { SearchX, X } from '@vben/icons'
-import { $t } from '@vben/locales'
+import { $t, useI18n } from '@vben/locales'
 import { mapTree, traverseTreeValues, uniqueByField } from '@vben/utils'
-
 import { VbenIcon, VbenScrollbar } from '@vben-core/shadcn-ui'
 import { isHttpUrl } from '@vben-core/shared/utils'
-
-import { onKeyStroke, useLocalStorage, useThrottleFn } from '@vueuse/core'
 
 defineOptions({
   name: 'SearchPanel'
@@ -27,6 +25,7 @@ const props = withDefaults(
 const emit = defineEmits<{ close: [] }>()
 
 const router = useRouter()
+const { locale } = useI18n()
 const searchHistory = useLocalStorage<MenuRecordRaw[]>(
   `__search-history-${location.hostname}__`,
   []
@@ -34,48 +33,54 @@ const searchHistory = useLocalStorage<MenuRecordRaw[]>(
 const activeIndex = ref(-1)
 const searchItems = shallowRef<MenuRecordRaw[]>([])
 const searchResults = ref<MenuRecordRaw[]>([])
+const displayResults = computed(() =>
+  uniqueByField(searchResults.value, 'path')
+)
+const searchIndex = shallowRef<
+  Array<{ item: MenuRecordRaw; nameLower: string }>
+>([])
 
-const handleSearch = useThrottleFn(search, 200)
+const handleSearch = useThrottleFn(searchFromIndex, 200)
 
-// 搜索函数，用于根据搜索关键词查找匹配的菜单项
-function search(searchKey: string) {
-  // 去除搜索关键词的前后空格
-  searchKey = searchKey.trim()
+function rebuildSearchSource() {
+  searchItems.value = mapTree(props.menus, item => {
+    return {
+      ...item,
+      name: $t(item?.name)
+    }
+  })
 
-  // 如果搜索关键词为空，清空搜索结果并返回
+  const index: Array<{ item: MenuRecordRaw; nameLower: string }> = []
+  traverseTreeValues(searchItems.value, item => {
+    index.push({
+      item,
+      nameLower: item.name?.toLowerCase() ?? ''
+    })
+  })
+  searchIndex.value = index
+}
+
+function searchFromIndex(searchKey: string) {
+  searchKey = searchKey.trim().toLowerCase()
+
   if (!searchKey) {
     searchResults.value = []
     return
   }
 
-  // 使用搜索关键词创建正则表达式
   const reg = createSearchReg(searchKey)
-
-  // 初始化结果数组
   const results: MenuRecordRaw[] = []
 
-  // 遍历搜索项
-  traverseTreeValues(searchItems.value, item => {
-    // 如果菜单项的名称匹配正则表达式，将其添加到结果数组中
-    if (reg.test(item.name?.toLowerCase())) {
+  for (const { item, nameLower } of searchIndex.value) {
+    if (reg.test(nameLower)) {
       results.push(item)
     }
-  })
-
-  // 更新搜索结果
-  searchResults.value = results
-
-  // 如果有搜索结果，设置索引为 0
-  if (results.length > 0) {
-    activeIndex.value = 0
   }
 
-  // 赋值索引为 0
-  activeIndex.value = 0
+  searchResults.value = results
+  activeIndex.value = results.length > 0 ? 0 : -1
 }
 
-// When the keyboard up and down keys move to an invisible place
-// the scroll bar needs to scroll automatically
 function scrollIntoView() {
   const element = document.querySelector(
     `[data-search-item="${activeIndex.value}"]`
@@ -86,76 +91,94 @@ function scrollIntoView() {
   }
 }
 
-// enter keyboard event
-async function handleEnter() {
-  if (searchResults.value.length === 0) {
+async function handleEnter(clickedIdx?: number) {
+  if (displayResults.value.length === 0) {
     return
   }
-  const result = searchResults.value
-  const index = activeIndex.value
-  if (result.length === 0 || index < 0) {
+
+  const result = displayResults.value
+  const index = typeof clickedIdx === 'number' ? clickedIdx : activeIndex.value
+  if (index < 0 || index >= result.length) {
     return
   }
+
+  activeIndex.value = index
   const to = result[index]
-  if (to) {
-    searchHistory.value = uniqueByField([...searchHistory.value, to], 'path')
-    handleClose()
-    await nextTick()
-    if (isHttpUrl(to.path)) {
-      window.open(to.path, '_blank')
-    } else {
-      router.push({ path: to.path, replace: true })
+  if (!to) {
+    return
+  }
+
+  searchHistory.value = uniqueByField([...searchHistory.value, to], 'path')
+  handleClose()
+  await nextTick()
+
+  if (isHttpUrl(to.path)) {
+    const newTab = window.open(to.path, '_blank', 'noopener,noreferrer')
+    if (newTab) {
+      newTab.opener = null
     }
+  } else {
+    router.push({ path: to.path, replace: true })
   }
 }
 
-// Arrow key up
 function handleUp() {
-  if (searchResults.value.length === 0) {
+  if (displayResults.value.length === 0) {
     return
   }
   activeIndex.value--
   if (activeIndex.value < 0) {
-    activeIndex.value = searchResults.value.length - 1
+    activeIndex.value = displayResults.value.length - 1
   }
   scrollIntoView()
 }
 
-// Arrow key down
 function handleDown() {
-  if (searchResults.value.length === 0) {
+  if (displayResults.value.length === 0) {
     return
   }
   activeIndex.value++
-  if (activeIndex.value > searchResults.value.length - 1) {
+  if (activeIndex.value > displayResults.value.length - 1) {
     activeIndex.value = 0
   }
   scrollIntoView()
 }
 
-// close search modal
 function handleClose() {
   searchResults.value = []
   emit('close')
 }
 
-// Activate when the mouse moves to a certain line
-function handleMouseenter(e: MouseEvent) {
-  const index = (e.target as HTMLElement)?.dataset.index
-  activeIndex.value = Number(index)
+function handleMouseenter(index: number) {
+  activeIndex.value = index
 }
 
 function removeItem(index: number) {
-  if (props.keyword) {
-    searchResults.value.splice(index, 1)
-  } else {
-    searchHistory.value.splice(index, 1)
+  const target = displayResults.value[index]
+  if (!target) {
+    return
   }
-  activeIndex.value = Math.max(activeIndex.value - 1, 0)
+
+  if (props.keyword) {
+    searchResults.value = searchResults.value.filter(
+      item => item.path !== target.path
+    )
+  } else {
+    searchHistory.value = searchHistory.value.filter(
+      item => item.path !== target.path
+    )
+    searchResults.value = [...searchHistory.value]
+  }
+
+  const length = displayResults.value.length
+  if (length === 0) {
+    activeIndex.value = -1
+    return
+  }
+  activeIndex.value = Math.min(activeIndex.value, length - 1)
   scrollIntoView()
 }
 
-// 存储所有需要转义的特殊字符
 const code = new Set([
   '$',
   '(',
@@ -173,20 +196,12 @@ const code = new Set([
   '}'
 ])
 
-// 转换函数，用于转义特殊字符
 function transform(c: string) {
-  // 如果字符在特殊字符列表中，返回转义后的字符
-  // 如果不在，返回字符本身
   return code.has(c) ? `\\${c}` : c
 }
 
-// 创建搜索正则表达式
 function createSearchReg(key: string) {
-  // 将输入的字符串拆分为单个字符
-  // 对每个字符进行转义
-  // 然后用'.*'连接所有字符，创建正则表达式
   const keys = [...key].map(item => transform(item)).join('.*')
-  // 返回创建的正则表达式
   return new RegExp(`.*${keys}.*`)
 }
 
@@ -196,22 +211,32 @@ watch(
     if (val) {
       handleSearch(val)
     } else {
-      searchResults.value = [...searchHistory.value]
+      searchResults.value = searchHistory.value
     }
   }
 )
 
-onMounted(() => {
-  searchItems.value = mapTree(props.menus, item => {
-    return {
-      ...item,
-      name: $t(item?.name)
+watch(
+  [() => props.menus, () => locale.value],
+  () => {
+    rebuildSearchSource()
+    if (props.keyword) {
+      handleSearch(props.keyword)
     }
-  })
-  if (searchHistory.value.length > 0) {
-    searchResults.value = searchHistory.value
+  },
+  {
+    deep: true,
+    immediate: true
   }
-  onKeyStroke('Enter', handleEnter)
+)
+
+onMounted(() => {
+  if (searchHistory.value.length > 0) {
+    searchResults.value = [...searchHistory.value]
+  }
+  onKeyStroke('Enter', () => {
+    handleEnter()
+  })
   onKeyStroke('ArrowUp', handleUp)
   onKeyStroke('ArrowDown', handleDown)
   onKeyStroke('Escape', handleClose)
@@ -221,9 +246,8 @@ onMounted(() => {
 <template>
   <VbenScrollbar>
     <div class="flex! h-full justify-center px-2 sm:max-h-112.5">
-      <!-- 无搜索结果 -->
       <div
-        v-if="keyword && searchResults.length === 0"
+        v-if="keyword && displayResults.length === 0"
         class="text-muted-foreground text-center"
       >
         <SearchX class="mx-auto mt-4 size-12" />
@@ -234,9 +258,8 @@ onMounted(() => {
           </span>
         </p>
       </div>
-      <!-- 历史搜索记录 & 没有搜索结果 -->
       <div
-        v-if="!keyword && searchResults.length === 0"
+        v-if="!keyword && displayResults.length === 0"
         class="text-muted-foreground text-center"
       >
         <p class="my-10 text-xs">
@@ -244,7 +267,7 @@ onMounted(() => {
         </p>
       </div>
 
-      <ul v-show="searchResults.length > 0" class="w-full">
+      <ul v-show="displayResults.length > 0" class="w-full">
         <li
           v-if="searchHistory.length > 0 && !keyword"
           class="text-muted-foreground mb-2 text-xs"
@@ -252,7 +275,7 @@ onMounted(() => {
           {{ $t('ui.widgets.search.recent') }}
         </li>
         <li
-          v-for="(item, index) in uniqueByField(searchResults, 'path')"
+          v-for="(item, index) in displayResults"
           :key="item.path"
           :class="
             activeIndex === index
@@ -262,8 +285,8 @@ onMounted(() => {
           :data-index="index"
           :data-search-item="index"
           class="group flex-center bg-accent mb-3 w-full cursor-pointer rounded-lg p-4"
-          @click="handleEnter"
-          @mouseenter="handleMouseenter"
+          @click="handleEnter(index)"
+          @mouseenter="handleMouseenter(index)"
         >
           <VbenIcon :icon="item.icon" class="mr-2 size-5 shrink-0" fallback />
 
